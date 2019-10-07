@@ -225,9 +225,12 @@ public class ReadCSV{
 
 	public int find_seq(String[] mssg){
 		for(int i=9; i<mssg.length; i++){
-			if(mssg[i].substring(0,4).equals("Seq=")){
+			if(mssg[i].length()>4){
+				if(mssg[i].substring(0,4).equals("Seq=")){
 				return Integer.parseInt(mssg[i].substring(4,mssg[i].length()));
+				}
 			}
+			
 		}
 		return -1;
 	}
@@ -235,8 +238,10 @@ public class ReadCSV{
 
 	public int find_ack(String[] mssg){
 		for(int i=9; i<mssg.length; i++){
-			if(mssg[i].substring(0,4).equals("Ack=")){
+			if(mssg[i].length()>4){
+				if(mssg[i].substring(0,4).equals("Ack=")){
 				return Integer.parseInt(mssg[i].substring(4,mssg[i].length()));
+				}
 			}
 		}
 		return -1;
@@ -249,9 +254,45 @@ public class ReadCSV{
 		String row = csvReader.readLine();
 		while ((row = csvReader.readLine()) != null) {
 		    String[] data = row.split(",");
-			String[] mssg = data[6].split("\\s+");
-			int byte_numb = Integer.parseInt(data[5]);
+		    // System.out.println("0: "+data[0]);
+		    if(data.length > 6){
+		    	for(int i=7; i<data.length; i++)
+		    		data[6] = data[6] + "," + data[i];
+		    }
+		    
+		    int start=-1;
+		    int end=-1;
 
+		    for(int i=0; i<7; i++){		//removing inverted quotes
+				// System.out.println(data[i]);
+				start=-1;
+			    end=-1;
+
+		    	int j=0;
+		    	for(j=0; j<data[i].length(); j++){
+		    		if(data[i].substring(j,j+1).equals("\"")){
+		    			start = j;
+		    			break;
+		    		}
+		    	}
+		    	for(j=j+1; j<data[i].length(); j++){
+		    		if(data[i].substring(j,j+1).equals("\"")){
+		    			end = j;
+		    			break;
+		    		}
+		    	}
+
+		    	if(end>start && start>=0){
+		    		data[i] = data[i].substring(start+1,end);
+		    		// System.out.println(data[i]);
+		    	}
+
+		    }
+			String[] mssg = data[6].split("\\s+");
+			// int byte_numb = Integer.parseInt(data[5]);
+
+			// System.out.println(data[0]);
+			
 			if(data[4].equals("TCP")){
 				if(mssg[3].equals("[SYN]")){
 					if(!isMember(data[2],client_list)){
@@ -341,11 +382,15 @@ public class ReadCSV{
 			else{
 				Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]));
 				pack.setMssg(data[6]);
-				if(find_seq(mssg)>0)
-						pack.setSeq(find_seq(mssg));
-				if(find_ack(mssg)>0)
-					pack.setAck(find_ack(mssg));
-					
+				
+				int seq = find_seq(mssg);
+				int ack = find_ack(mssg);
+				// System.out.println("here "+seq);
+				if((seq)>0)
+					pack.setSeq(seq);
+				if(ack>0)
+					pack.setAck(ack);
+				// System.out.println("here2");	
 				int ind1 = getIndex_TCP(data[2],data[3]);
 				int ind2 = getIndex_TCP(data[3],data[2]);
 				if(ind1>=0){
@@ -354,7 +399,9 @@ public class ReadCSV{
 				if(ind2>0){
 					live_TCP.get(ind2).insertPacket_rec(pack);
 				}
+				// System.out.println("here3");
 			}
+			System.out.println("done");
 		}
 		csvReader.close();
 		}catch(Exception e){
@@ -370,8 +417,8 @@ public class ReadCSV{
 	public static void main(String[] args) 
     { 
 
-        ReadCSV reader = new ReadCSV("file_name"); 
-
+        ReadCSV reader = new ReadCSV("2.csv"); 
+        reader.read_data();
         // System.out.println(tuffy.toString()); 
     } 
 
