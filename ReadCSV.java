@@ -42,9 +42,9 @@ class TCP_connect{
         return t_end; 
     } 
 
-    public void setT_start(float t_end) 
+    public void setT_start(float t_start) 
     { 
-        this.t_end = t_end; 
+        this.t_start = t_start; 
     } 
 
     public void setT_end(float t_end) 
@@ -88,14 +88,18 @@ class Packet{
 	float time;
 	int total_bytes;
 	String message;
+	int type;
 	int seq;
 	int ack;
 
-	public Packet(String sourceIP, String destIP, float time, int total_bytes){
+	public Packet(String sourceIP, String destIP, float time, int total_bytes, int type){
 		this.srcIP = sourceIP;
 		this.destIP = destIP;
 		this.total_bytes = total_bytes;
 		this.time = time;
+		this.seq = 0;
+		this.ack = 0;
+		this.type = type;
 	}
 
 	public String getSrcIP() 
@@ -122,6 +126,10 @@ class Packet{
 
     public int getAck(){
     	return ack;
+    }
+
+    public int getType(){
+    	return type;
     }
 
     public void setMssg(String m){
@@ -295,13 +303,16 @@ public class ReadCSV{
 			
 			if(data[4].equals("TCP")){
 				if(mssg[3].equals("[SYN]")){
-					if(!isMember(data[2],client_list)){
-						client_list.add(data[2]);
+					if(!mssg[0].equals("21")){
+						if(!isMember(data[2],client_list)){
+							client_list.add(data[2]);
+						}
 					}
-					if(!isMember(data[3],server_list)){
-						server_list.add(data[3]);
+					if(mssg[2].equals("21")){
+						if(!isMember(data[3],server_list)){
+							server_list.add(data[3]);
+						}
 					}
-
 					ConnectionID temp_id = new ConnectionID(data[2], data[3], mssg[0], mssg[2]);
 					if(isMember_TCP(temp_id)){		//means SYN Ack was lost and so again initailised the same connection
 						int i = getIndex_TCP(temp_id);
@@ -315,7 +326,7 @@ public class ReadCSV{
 
 					}
 					TCP_connect temp_tcp = new TCP_connect(temp_id,Float.parseFloat(data[1]));
-					Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]));
+					Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]),1);
 					pack.setMssg(data[6]);
 					if(find_seq(mssg)>0)
 						pack.setSeq(find_seq(mssg));
@@ -327,7 +338,7 @@ public class ReadCSV{
 					live_TCP.add(temp_tcp);
 				}
 				else if(mssg[3].equals("[FIN,") || mssg[3].equals("[RST]") ){		//closing a TCP connection
-					Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]));
+					Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]),1);
 					pack.setMssg(data[6]);
 					if(find_seq(mssg)>0)
 						pack.setSeq(find_seq(mssg));
@@ -335,7 +346,7 @@ public class ReadCSV{
 						pack.setAck(find_ack(mssg));
 
 					ConnectionID temp_id1 = new ConnectionID(data[2], data[3], mssg[0], mssg[2]);
-					ConnectionID temp_id2 = new ConnectionID(data[2], data[3], mssg[2], mssg[0]);
+					ConnectionID temp_id2 = new ConnectionID(data[3], data[2], mssg[2], mssg[0]);
 					int ind1 = getIndex_TCP(temp_id1);
 					int ind2 = getIndex_TCP(temp_id2);
 					if(ind1>=0){
@@ -360,7 +371,7 @@ public class ReadCSV{
 
 				}
 				else {		//cases like SYN,ACK, or ACK or PSH,ACK
-					Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]));
+					Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]),1);
 					pack.setMssg(data[6]);
 					if(find_seq(mssg)>0)
 						pack.setSeq(find_seq(mssg));
@@ -380,7 +391,7 @@ public class ReadCSV{
 				}
 			}
 			else{
-				Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]));
+				Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]),2);
 				pack.setMssg(data[6]);
 				
 				int seq = find_seq(mssg);
