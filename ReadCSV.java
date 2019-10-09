@@ -1,5 +1,5 @@
 import java.io.*; 
-import java.util.*;
+import java.util.*;		
 
 
 class TCP_connect{
@@ -181,11 +181,11 @@ class ConnectionID{
 }
 
 public class ReadCSV{
-	String csvFile;
-	ArrayList<String> server_list = new ArrayList<String>();
-	ArrayList<String> client_list = new ArrayList<String>();
-	ArrayList<TCP_connect> TCP_list = new ArrayList<TCP_connect>();			//list of all TCP connections made 
-	ArrayList<TCP_connect> live_TCP = new ArrayList<TCP_connect>();			//list of currently live TCP connections
+	static String csvFile;
+	static ArrayList<String> server_list = new ArrayList<String>();
+	static ArrayList<String> client_list = new ArrayList<String>();
+	static ArrayList<TCP_connect> TCP_list = new ArrayList<TCP_connect>();			//list of all TCP connections made 
+	static ArrayList<TCP_connect> live_TCP = new ArrayList<TCP_connect>();			//list of currently live TCP connections
 
 
 	public ArrayList<String> getServer_list(){
@@ -400,29 +400,30 @@ public class ReadCSV{
 					}
 				}
 			}
-			else{
-				Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]),2);
-				pack.setMssg(data[6]);
+			//FTP
+			// else{
+			// 	Packet pack = new Packet(data[2],data[3],Float.parseFloat(data[1]),Integer.parseInt(data[5]),2);
+			// 	pack.setMssg(data[6]);
 				
-				int seq = find_seq(mssg);
-				int ack = find_ack(mssg);
-				// System.out.println("here "+seq);
-				if((seq)>0)
-					pack.setSeq(seq);
-				if(ack>0)
-					pack.setAck(ack);
-				// System.out.println("here2");	
-				int ind1 = getIndex_TCP(data[2],data[3]);
-				int ind2 = getIndex_TCP(data[3],data[2]);
-				if(ind1>=0){
-					live_TCP.get(ind1).insertPacket_sent(pack);
-				}
-				if(ind2>0){
-					live_TCP.get(ind2).insertPacket_rec(pack);
-				}
-				// System.out.println("here3");
-			}
-			// System.out.println("done");
+			// 	int seq = find_seq(mssg);
+			// 	int ack = find_ack(mssg);
+			// 	// System.out.println("here "+seq);
+			// 	if((seq)>0)
+			// 		pack.setSeq(seq);
+			// 	if(ack>0)
+			// 		pack.setAck(ack);
+			// 	// System.out.println("here2");	
+			// 	int ind1 = getIndex_TCP(data[2],data[3]);
+			// 	int ind2 = getIndex_TCP(data[3],data[2]);
+			// 	if(ind1>=0){
+			// 		live_TCP.get(ind1).insertPacket_sent(pack);
+			// 	}
+			// 	if(ind2>0){
+			// 		live_TCP.get(ind2).insertPacket_rec(pack);
+			// 	}
+			// 	// System.out.println("here3");
+			// }
+			// // System.out.println("done");
 		}
 		csvReader.close();
 
@@ -440,7 +441,7 @@ public class ReadCSV{
 	public static void main(String[] args) 
     { 
 
-        ReadCSV reader = new ReadCSV("2.csv"); 
+        ReadCSV reader = new ReadCSV("3.csv"); 
         reader.read_data();
         // System.out.println(tuffy.toString());
         ArrayList<String> serverList = reader.getServer_list();
@@ -452,15 +453,32 @@ public class ReadCSV{
         // System.out.println("\n");
 
         ArrayList<String> clientList = reader.getClient_list();
+
         System.out.println("1: "+clientList.size());
         System.out.println(reader.getTCP_list().size());
         System.out.println(reader.getLive_TCP().size());
 
-        // for(int i=0; i<clientList.size(); i++){
-        // 	System.out.println(clientList.get(i));
-        // }
+        ArrayList<TCP_connect> TCP_connections = reader.getTCP_list();
+        ArrayList<TCP_connect> Live_conne = reader.getTCP_list();
 
-    } 
+        ArrayList<float> time_start = reader.
+
+//Q4-------------------------------------------------------    
+//       String s_4 = "";
+
+//       ArrayList<TCP_connect> TCPs = reader.getTCP_list();
+//       for(int i=0; i<TCPs.size(); i++){
+//       	s_4 = s_4 + Integer.toString(i+1) + "  " + Float.toString(TCPs.get(i).getT_end() - TCPs.get(i).getT_start()) +"\n";
+//       }
+
+//       try{
+//       	FileWriter fw=new FileWriter("q4_3.txt");    
+ //        fw.write(s_4);    
+ //        fw.close();  
+//       }catch(Exception e){
+//       	System.out.println(e);
+		// } 
+    }
 
 }
 
