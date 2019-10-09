@@ -187,6 +187,26 @@ public class ReadCSV{
 	ArrayList<TCP_connect> TCP_list = new ArrayList<TCP_connect>();			//list of all TCP connections made 
 	ArrayList<TCP_connect> live_TCP = new ArrayList<TCP_connect>();			//list of currently live TCP connections
 
+
+	public ArrayList<String> getServer_list(){
+		return server_list;
+	}
+
+	public ArrayList<String> getClient_list(){
+		return client_list;
+	}
+
+	public ArrayList<TCP_connect> getTCP_list(){
+		return TCP_list;
+	}
+
+	public ArrayList<TCP_connect> getLive_TCP(){
+		return live_TCP;
+	}
+
+
+
+
 	//constructor
 	public ReadCSV(String csv){
 		this.csvFile = csv;
@@ -316,12 +336,6 @@ public class ReadCSV{
 					ConnectionID temp_id = new ConnectionID(data[2], data[3], mssg[0], mssg[2]);
 					if(isMember_TCP(temp_id)){		//means SYN Ack was lost and so again initailised the same connection
 						int i = getIndex_TCP(temp_id);
-						for(int j=0 ;j<TCP_list.size();j++){		//remove from all TCP list
-							if(TCP_list.get(j)==live_TCP.get(i)){
-								TCP_list.remove(j);
-								break;
-							}
-						}
 						live_TCP.remove(i);		//remove from live_TCP list
 
 					}
@@ -334,7 +348,7 @@ public class ReadCSV{
 						pack.setAck(find_ack(mssg));
 					
 					temp_tcp.insertPacket_sent(pack);		//to set current SYN packet 
-					TCP_list.add(temp_tcp);
+					// TCP_list.add(temp_tcp);
 					live_TCP.add(temp_tcp);
 				}
 				else if(mssg[3].equals("[FIN,") || mssg[3].equals("[RST]") ){		//closing a TCP connection
@@ -352,20 +366,16 @@ public class ReadCSV{
 					if(ind1>=0){
 						live_TCP.get(ind1).setT_end(Float.parseFloat(data[1]));		//setting t_end for the TCP_connection
 						live_TCP.get(ind1).insertPacket_sent(pack);
-						for(int i=TCP_list.size()-1; i>=0; i--){
-							if(compareID(live_TCP.get(ind1).getConnectionID(), TCP_list.get(i).getConnectionID()))
-								TCP_list.set(i,live_TCP.get(ind1));		//updated the TCP Connection before closing it and removing from live TCP list
-						}
+						
+						TCP_list.add(live_TCP.get(ind1));
 						live_TCP.remove(ind1);
 						//do something here and also checl for above packets which cone after this command
 					}
 					if(ind2>0){
 						live_TCP.get(ind2).setT_end(Float.parseFloat(data[1]));		//setting t_end for the TCP_connection
 						live_TCP.get(ind2).insertPacket_rec(pack);
-						for(int i=TCP_list.size()-1; i>=0; i--){
-							if(compareID(live_TCP.get(ind2).getConnectionID(), TCP_list.get(i).getConnectionID()))
-								TCP_list.set(i,live_TCP.get(ind2));		//updated the TCP Connection before closing it and removing from live TCP list
-						}
+						
+						TCP_list.add(live_TCP.get(ind2));
 						live_TCP.remove(ind2);
 					}
 
@@ -412,9 +422,11 @@ public class ReadCSV{
 				}
 				// System.out.println("here3");
 			}
-			System.out.println("done");
+			// System.out.println("done");
 		}
 		csvReader.close();
+
+
 		}catch(Exception e){
 			System.out.println(e);
 		}
@@ -430,7 +442,24 @@ public class ReadCSV{
 
         ReadCSV reader = new ReadCSV("2.csv"); 
         reader.read_data();
-        // System.out.println(tuffy.toString()); 
+        // System.out.println(tuffy.toString());
+        ArrayList<String> serverList = reader.getServer_list();
+        System.out.println("1: "+serverList.size());
+        // for(int i=0; i<serverList.size(); i++){
+        // 	System.out.println(serverList.get(i));
+        // }
+
+        // System.out.println("\n");
+
+        ArrayList<String> clientList = reader.getClient_list();
+        System.out.println("1: "+clientList.size());
+        System.out.println(reader.getTCP_list().size());
+        System.out.println(reader.getLive_TCP().size());
+
+        // for(int i=0; i<clientList.size(); i++){
+        // 	System.out.println(clientList.get(i));
+        // }
+
     } 
 
 }
