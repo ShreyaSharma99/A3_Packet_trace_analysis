@@ -186,7 +186,8 @@ public class ReadCSV{
 	static ArrayList<String> client_list = new ArrayList<String>();
 	static ArrayList<TCP_connect> TCP_list = new ArrayList<TCP_connect>();			//list of all TCP connections made 
 	static ArrayList<TCP_connect> live_TCP = new ArrayList<TCP_connect>();			//list of currently live TCP connections
-
+	static int maxind1 = 0;
+	static int maxind2 = 0;
 
 	public ArrayList<String> getServer_list(){
 		return server_list;
@@ -466,8 +467,17 @@ public class ReadCSV{
 
         //Question 5
         String answer5 = "";
+        int max1= TCP_list.get(0).pack_sent.size() + TCP_list.get(0).pack_rec.size();
+        int max2 = TCP_list.get(0).pack_sent.size() + TCP_list.get(0).pack_rec.size();
         for(int i=0; i<TCP_list.size();i++){
-        	System.out.println(TCP_list.get(i).pack_rec.size());
+        	//System.out.println(TCP_list.get(i).pack_rec.size());
+        	int tmp = TCP_list.get(i).pack_sent.size() + TCP_list.get(i).pack_rec.size();
+        	if(tmp > max1){
+        		max2 = max1;
+        		max1 = tmp;
+        		maxind2 = maxind1;
+        		maxind1 = i;
+        	}
         	ConnectionID temp = TCP_list.get(i).getConnectionID();
         	answer5 += temp.getSrcIP() + " " + temp.getDestIP()+ " " + temp.getSrcPort() + " " + temp.getDestPort();
         	if(i != TCP_list.size()-1)
@@ -479,9 +489,47 @@ public class ReadCSV{
         FileWriter fw1 = new FileWriter(file);
         fw1.write(answer5);
         fw1.close();       
+        System.out.println(maxind1 + " " + maxind2);
+
+        //Question 7
+        String answer7 = "";
+        for(int i=0; i<TCP_list.size();i++){
+        	ArrayList<Packet> temp_list = TCP_list.get(i).pack_sent;
+        	for(int j=1; j<temp_list.size();j++)
+        		answer7 += Float.toString(temp_list.get(j).time - temp_list.get(j-1).time) + "\n"; 
+        }
+		file = "q7_" + filenum + ".txt";
+        FileWriter fw2 = new FileWriter(file);
+        fw2.write(answer7);
+        fw2.close();        
+
+        //Question 8
+        String answer8 = "";
+		file = "q8_" + filenum + "_bytes_sent.txt";
+        FileWriter fw3 = new FileWriter(file);
+        for(int i=0; i<TCP_list.size();i++){
+        	ArrayList<Packet> temp_list = TCP_list.get(i).pack_sent;
+        	for(int j=0; j<temp_list.size();j++)
+        		answer8 += Integer.toString(temp_list.get(j).total_bytes) + "\n"; 
+        }
+        fw3.write(answer8);
+        fw3.close();
+        answer8 = "";
+        for(int i=0; i<TCP_list.size();i++){
+        	ArrayList<Packet> temp_list = TCP_list.get(i).pack_rec;
+        	for(int j=0; j<temp_list.size();j++){
+        		if( i != TCP_list.size()-1 && j != temp_list.size()-1)
+        			answer8 += Integer.toString(temp_list.get(j).total_bytes) + "\n"; 
+        		else
+        			answer8 += Integer.toString(temp_list.get(j).total_bytes); 
+        	}
+        }
+        file = "q8_" + filenum + "_bytes_rec.txt";
+        FileWriter fw4 = new FileWriter(file);
+        fw4.write(answer8);
+        fw4.close();
 
 
-        //Question 
     } 
 
 }
