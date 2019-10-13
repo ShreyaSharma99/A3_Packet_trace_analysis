@@ -539,3 +539,36 @@ public class ReadCSV{
 //we update the tcp_connection in the all_TCP list only when it is closed at some FIN or RST
 
 //For q7 we need to maintain all the packets sent to server may those be the ones whose reply is lost in the process. 
+
+
+
+
+
+
+
+
+//       String answer5 = "";
+  //       int max1= TCP_list.get(0).pack_sent.size() + TCP_list.get(0).pack_rec.size();
+  //       int max2 = TCP_list.get(0).pack_sent.size() + TCP_list.get(0).pack_rec.size();
+  //       for(int i=0; i<TCP_list.size();i++){
+  //       	//System.out.println(TCP_list.get(i).pack_rec.size());
+  //       	int tmp = TCP_list.get(i).pack_sent.size() + TCP_list.get(i).pack_rec.size();
+  //       	if(tmp > max1){
+  //       		max2 = max1;
+  //       		max1 = tmp;
+  //       		maxind2 = maxind1;
+  //       		maxind1 = i;
+  //       	}
+  //       	ConnectionID temp = TCP_list.get(i).getConnectionID();
+  //       	answer5 += temp.getSrcIP() + " " + temp.getDestIP()+ " " + temp.getSrcPort() + " " + temp.getDestPort();
+  //       	if(i != TCP_list.size()-1)
+  //       		answer5 += " " + Float.toString(TCP_list.get(i).getT_end() - TCP_list.get(i).getT_start()) + " " + Integer.toString(TCP_list.get(i).getBytes_sent() - (20*TCP_list.get(i).pack_sent.size())) + " " + Integer.toString(TCP_list.get(i).getBytes_rec()- (20*TCP_list.get(i).pack_rec.size())) +"\n";
+  //       	else
+  //       		answer5 += " " + Float.toString(TCP_list.get(i).getT_end() - TCP_list.get(i).getT_start()) + " " + Integer.toString(TCP_list.get(i).getBytes_sent() - (20*TCP_list.get(i).pack_sent.size())) + " " + Integer.toString(TCP_list.get(i).getBytes_rec()- (20*TCP_list.get(i).pack_rec.size()));
+  //       }
+		// file = "q5_" + filenum + ".txt";
+  //       FileWriter fw1 = new FileWriter(file);
+  //       fw1.write(answer5);
+  //       fw1.close();       
+  //       System.out.println(maxind1 + " " + maxind2);
+
